@@ -36,11 +36,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         createComponents()
         addViewsToSuperview()
         applyConstraints()
-        setupObservers()
-    }
-    
-    private func setupObservers() {
-        
     }
     
     private func createComponents() {

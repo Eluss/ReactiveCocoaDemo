@@ -17,7 +17,7 @@ class FormViewModel {
     var isSuperUserViewModel: FormSwitchFieldViewModel
     var userDataPresenter: UserDataPresenter
     var isFormValid = MutableProperty<Bool>(false)
-    var acceptFormAction: Action<Void, User, NSError>!
+
     var acceptTitle = "Save"
     var isSuperUserTitle = "Super user"
     
@@ -43,39 +43,10 @@ class FormViewModel {
         emailViewModel = FormFieldViewModel.emailField(user.email)
         isSuperUserViewModel = FormSwitchFieldViewModel(onTitle: "Super user", offTitle: "Default user", isOn: user.isSuperUser)
         
-        acceptFormAction = Action<Void, User, NSError>(enabledIf: isFormValid, {[unowned self] () -> SignalProducer<User, NSError> in
-            return self.saveUser()
-        })
-        
         setupObservers()
     }
     
-    private func saveUser() -> SignalProducer<User, NSError> {
-        return SignalProducer<User, NSError> {[weak self] observer, disposable in
-            guard let weakSelf = self else { return }
-            let user = weakSelf.user
-            let presenting = weakSelf.userDataPresenter.presentUserData(user)
-            presenting.startWithSignal({ (signal, disposable) in
-                
-                signal.observeCompleted({
-                    observer.sendNext(user)
-                    observer.sendCompleted()
-                })
-                
-                signal.observeFailed({ (error) in
-                    observer.sendFailed(error)
-                })
-            })
-        }
-    }
-    
     private func setupObservers() {
-        disposables += isFormValid <~ combineLatest(
-            firstNameViewModel.text.producer,
-            lastNameViewModel.text.producer,
-            emailViewModel.text.producer).map({[unowned self] (firstName, lastName, email) -> Bool in
-                return self.isValidEmail(email) && !firstName.isEmpty && !lastName.isEmpty
-            })
     }
     
     func isValidEmail(testStr: String) -> Bool {

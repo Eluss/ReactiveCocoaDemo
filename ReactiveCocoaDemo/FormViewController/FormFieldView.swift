@@ -44,15 +44,6 @@ class FormFieldView: UIView {
     }
     
     private func setupObservers() {
-        disposables += viewModel.isTitleHidden.producer.startWithNext {[weak self] (isTitleHidden) in
-            guard let weakSelf = self else { return }
-            UIView.animateWithDuration(0.4, animations: {
-                weakSelf.titleLabel.alpha = isTitleHidden ? 0 : 1
-            })
-        }
-        disposables += viewModel.text <~ textField.rex_text.producer.map {
-            $0!
-        }
     }
     
     private func createComponents() {

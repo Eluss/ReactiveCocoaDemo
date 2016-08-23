@@ -52,16 +52,6 @@ class FormViewController: UIViewController {
     }
     
     private func setupObservers() {
-        acceptCocoaAction = CocoaAction(viewModel.acceptFormAction, { _ in })
-        disposables +=  viewModel.acceptFormAction.errors.observeOn(QueueScheduler.mainQueueScheduler).observeNext {[weak self] (error) in
-            guard let weakSelf = self else { return }
-            weakSelf.acceptButton.backgroundColor = UIColor.redColor()
-        }
-        disposables += viewModel.isFormValid.producer.skip(1).skipRepeats().startWithNext {[weak self] (isValid) in
-            guard let weakSelf = self else { return }
-            weakSelf.animateAcceptButton(isValid)
-        }
-        acceptButton.rex_pressed.value = acceptCocoaAction
     }
     
     private func animateAcceptButton(isEnabled: Bool) {

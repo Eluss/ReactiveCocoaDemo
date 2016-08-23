@@ -17,23 +17,11 @@ class FormSwitchFieldViewModel {
     var onTitle: String
     var offTitle: String
     var isOn: MutableProperty<Bool>
-    var switchAction: Action<Bool, String, NoError>!
     
     init(onTitle: String, offTitle: String, isOn: Bool) {
         self.onTitle = onTitle
         self.offTitle = offTitle
         self.isOn = MutableProperty<Bool>(isOn)
-        
-        switchAction = Action<Bool, String, NoError>({[weak self] (isOn) -> SignalProducer<String, NoError> in
-            return SignalProducer<String, NoError> { observer, disposable in
-                guard let weakSelf = self else { return }
-                let text = isOn ? weakSelf.onTitle : weakSelf.offTitle
-                observer.sendNext(text)
-                observer.sendCompleted()
-            }
-        })
-        
-        setupObservers()
     }
     
     private func setupObservers() {
@@ -79,13 +67,6 @@ class FormSwitchFieldView: UIView {
     }
     
     private func setupObservers() {
-        disposables += viewModel.isOn <~ switchControl.rex_on
-        switchCocoaAction = CocoaAction(viewModel.switchAction, { (control) -> Bool in
-            let control = control as! UISwitch
-            return control.on
-        })
-        switchControl.addTarget(switchCocoaAction, action: CocoaAction.selector, forControlEvents: .ValueChanged)
-        disposables += titleLabel.rex_text <~ viewModel.switchAction.values.map { $0 }
     }
     
     private func createComponents() {

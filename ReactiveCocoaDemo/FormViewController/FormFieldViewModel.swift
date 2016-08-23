@@ -22,7 +22,6 @@ class FormFieldViewModel {
     }
     
     private func setupObservers() {
-        isTitleHidden <~ text.producer.map { $0.isEmpty }
     }
     
     static func firstNameField(text: String) -> FormFieldViewModel {

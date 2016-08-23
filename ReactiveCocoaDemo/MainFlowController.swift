@@ -27,10 +27,6 @@ class MainFlowController {
     }
     
     private func setupObservers() {
-        let disposable = mainViewModel.selectedScreen.observeNext {[unowned self] (screen) in
-            self.presentScreen(screen)
-        }
-        disposables.addDisposable(disposable)
     }
     
     private func presentScreen(screen: Screen) {
@@ -50,13 +46,6 @@ class MainFlowController {
         let presenter = UserDataPresenter(rootViewController: rootNavigationController)
         let viewModel = FormViewModel(userDataPresenter: presenter)
         let formViewController = FormViewController(viewModel: viewModel)
-        viewModel.acceptFormAction.rex_completed.observeOn(QueueScheduler.mainQueueScheduler).observeNext { [unowned self] in
-            self.dismissFormScreen()
-        }
-        
-        viewModel.acceptFormAction.values.observeNext {(user) in
-            print(user)
-        }
         
         rootNavigationController.pushViewController(formViewController, animated: true)
     }

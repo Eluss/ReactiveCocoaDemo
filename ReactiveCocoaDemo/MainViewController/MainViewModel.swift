@@ -11,20 +11,14 @@ import ReactiveCocoa
 import enum Result.NoError
 
 class MainViewModel {
-    
-    var selectedScreen: Signal<Screen, NoError>
     var menuItems: [MenuItem]
-    
-    private var selectedScreenObserver: Observer<Screen, NoError>
     
     init() {
         menuItems = [MenuItem.form(), MenuItem.loader()]
-        (selectedScreen, selectedScreenObserver) = Signal<Screen, NoError>.pipe()
     }
     
     func didChooseMenuItemAtIndex(index: Int) {
         let screen = menuItems[index].screen
-        selectedScreenObserver.sendNext(screen)
     }
     
 }

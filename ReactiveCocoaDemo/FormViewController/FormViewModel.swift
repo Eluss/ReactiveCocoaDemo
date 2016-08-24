@@ -16,7 +16,6 @@ class FormViewModel {
     var emailViewModel: FormFieldViewModel
     var isSuperUserViewModel: FormSwitchFieldViewModel
     var userDataPresenter: UserDataPresenter
-    var isFormValid = MutableProperty<Bool>(false)
 
     var acceptTitle = "Save"
     var isSuperUserTitle = "Super user"

@@ -13,6 +13,7 @@ import enum Result.NoError
 class MainViewModel {
     var menuItems: [MenuItem]
     
+    
     init() {
         menuItems = [MenuItem.form(), MenuItem.loader()]
     }

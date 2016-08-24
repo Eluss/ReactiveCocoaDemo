@@ -45,17 +45,12 @@ class LoaderViewController: UIViewController {
     }
     
     private func setupObservers() {
-        taskACocoaAction = CocoaAction(viewModel.taskAAction) { _ in }
-        taskBCocoaAction = CocoaAction(viewModel.taskBAction) { _ in }
-        
-        taskAButton.rex_pressed.value = taskACocoaAction
-        taskBButton.rex_pressed.value = taskBCocoaAction
     }
     
     private func createComponents() {
         taskAButton = createButtonWithTitle(viewModel.buttonATitle)
         taskBButton = createButtonWithTitle(viewModel.buttonBTitle)
-        statusIndicator = StatusIndicator(rootView: view, status: viewModel.statusSignal)
+//        statusIndicator = StatusIndicator(rootView: view, status: viewModel.statusSignal)
     }
     
     private func createButtonWithTitle(title: String) -> UIButton {

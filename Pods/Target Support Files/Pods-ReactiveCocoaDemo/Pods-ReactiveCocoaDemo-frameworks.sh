@@ -84,14 +84,12 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "Pods-ReactiveCocoaDemo/MBProgressHUD.framework"
   install_framework "Pods-ReactiveCocoaDemo/PureLayout.framework"
   install_framework "Pods-ReactiveCocoaDemo/ReactiveCocoa.framework"
   install_framework "Pods-ReactiveCocoaDemo/Result.framework"
   install_framework "Pods-ReactiveCocoaDemo/Rex.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "Pods-ReactiveCocoaDemo/MBProgressHUD.framework"
   install_framework "Pods-ReactiveCocoaDemo/PureLayout.framework"
   install_framework "Pods-ReactiveCocoaDemo/ReactiveCocoa.framework"
   install_framework "Pods-ReactiveCocoaDemo/Result.framework"

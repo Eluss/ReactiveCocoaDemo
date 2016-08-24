@@ -8,6 +8,5 @@ target 'ReactiveCocoaDemo' do
 pod 'ReactiveCocoa'
 pod 'Rex'
 pod 'PureLayout'
-pod 'MBProgressHUD'
 
 end

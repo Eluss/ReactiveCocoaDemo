@@ -9,11 +9,9 @@
 import Foundation
 import ReactiveCocoa
 import enum Result.NoError
-import MBProgressHUD
 
 class StatusIndicator {
     
-    private var progressHud: MBProgressHUD?
     private var status: Signal<Status, NoError>
     private var rootView: UIView
     private var disposables = CompositeDisposable()

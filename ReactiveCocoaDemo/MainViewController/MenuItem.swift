@@ -9,10 +9,10 @@
 import Foundation
 
 enum Screen {
-    case Form
-    case Loader
-    case NetworkRequest
-    case UIManipulation
+    case form
+    case loader
+    case networkRequest
+    case uiManipulation
 }
 
 struct MenuItem {
@@ -22,10 +22,10 @@ struct MenuItem {
     var screen: Screen
     
     static func form() -> MenuItem {
-        return MenuItem(title: "Form", subtitle: "Form with validation", screen: .Form)
+        return MenuItem(title: "Form", subtitle: "Form with validation", screen: .form)
     }
     
     static func loader() -> MenuItem {
-        return MenuItem(title: "Loader", subtitle: "Loader etc", screen: .Loader)
+        return MenuItem(title: "Loader", subtitle: "Loader etc", screen: .loader)
     }
 }

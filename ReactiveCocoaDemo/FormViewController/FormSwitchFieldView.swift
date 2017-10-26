@@ -9,7 +9,8 @@
 import Foundation
 import UIKit
 import ReactiveCocoa
-import Rex
+import ReactiveSwift
+
 import enum Result.NoError
 
 class FormSwitchFieldViewModel {
@@ -24,11 +25,11 @@ class FormSwitchFieldViewModel {
         self.offTitle = offTitle
         self.isOn = MutableProperty<Bool>(isOn)
         
-        switchAction = Action<Bool, String, NoError>({[weak self] (isOn) -> SignalProducer<String, NoError> in
+        switchAction = Action<Bool, String, NoError>(execute: {[weak self] (isOn) -> SignalProducer<String, NoError> in
             return SignalProducer<String, NoError> { observer, disposable in
-                guard let weakSelf = self else { return }
-                let text = isOn ? weakSelf.onTitle : weakSelf.offTitle
-                observer.sendNext(text)
+                guard let strongSelf = self else { return }
+                let text = isOn ? strongSelf.onTitle : strongSelf.offTitle
+                observer.send(value: text)
                 observer.sendCompleted()
             }
         })
@@ -36,7 +37,7 @@ class FormSwitchFieldViewModel {
         setupObservers()
     }
     
-    private func setupObservers() {
+    fileprivate func setupObservers() {
     }
     
     deinit {
@@ -47,16 +48,16 @@ class FormSwitchFieldViewModel {
 
 class FormSwitchFieldView: UIView {
     
-    private var viewModel: FormSwitchFieldViewModel!
+    fileprivate var viewModel: FormSwitchFieldViewModel!
     
-    private var titleLabel: UILabel!
-    private var switchControl: UISwitch!
-    private var switchCocoaAction: CocoaAction!
-    private var disposables = CompositeDisposable()
+    fileprivate var titleLabel: UILabel!
+    fileprivate var switchControl: UISwitch!
+    fileprivate var switchCocoaAction: CocoaAction<UISwitch>!
+    fileprivate var disposables = CompositeDisposable()
     
     init(viewModel: FormSwitchFieldViewModel) {
         self.viewModel = viewModel
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         
         setupView()
     }
@@ -65,7 +66,7 @@ class FormSwitchFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupView() {
+    fileprivate func setupView() {
         setupVisuals()
         createComponents()
         addViewsToSuperview()
@@ -73,50 +74,49 @@ class FormSwitchFieldView: UIView {
         setupObservers()
     }
     
-    private func setupVisuals() {
+    fileprivate func setupVisuals() {
         backgroundColor = UIColor.demoBackgroundColor()
         layer.cornerRadius = 6
     }
     
-    private func setupObservers() {
-        disposables += viewModel.isOn <~ switchControl.rex_on
+    fileprivate func setupObservers() {
+        disposables += viewModel.isOn <~ switchControl.reactive.isOnValues
         switchCocoaAction = CocoaAction(viewModel.switchAction, { (control) -> Bool in
-            let control = control as! UISwitch
-            return control.on
+            return control.isOn
         })
-        switchControl.addTarget(switchCocoaAction, action: CocoaAction.selector, forControlEvents: .ValueChanged)
-        disposables += titleLabel.rex_text <~ viewModel.switchAction.values.map { $0 }
+        switchControl.addTarget(switchCocoaAction, action: CocoaAction<UISwitch>.selector, for: .valueChanged)
+        disposables += titleLabel.reactive.text <~ viewModel.switchAction.values.map { $0 }
     }
     
-    private func createComponents() {
+    fileprivate func createComponents() {
         switchControl = createSwitchControl()
         titleLabel = createTitleLabel()
     }
     
-    private func createSwitchControl() -> UISwitch {
+    fileprivate func createSwitchControl() -> UISwitch {
         let switchControl = UISwitch()
-        switchControl.on = viewModel.isOn.value
+        switchControl.isOn = viewModel.isOn.value
         return switchControl
     }
     
-    private func createTitleLabel() -> UILabel {
+    fileprivate func createTitleLabel() -> UILabel {
         let label = UILabel()
         label.textColor = UIColor.demoTextColor()
         label.text = viewModel.isOn.value ? viewModel.onTitle : viewModel.offTitle
         return label
     }
     
-    private func addViewsToSuperview() {
+    fileprivate func addViewsToSuperview() {
         addSubview(titleLabel)
         addSubview(switchControl)
     }
     
-    private func applyConstraints() {
-        switchControl.autoPinEdgeToSuperviewEdge(.Left, withInset: 20)
-        switchControl.autoAlignAxisToSuperviewAxis(.Horizontal)
+    fileprivate func applyConstraints() {
+        switchControl.autoPinEdge(toSuperviewEdge: .left, withInset: 20)
+        switchControl.autoAlignAxis(toSuperviewAxis: .horizontal)
         
-        titleLabel.autoPinEdge(.Left, toEdge: .Right, ofView: switchControl, withOffset: 20)
-        titleLabel.autoAlignAxisToSuperviewAxis(.Horizontal)
+        titleLabel.autoPinEdge(.left, to: .right, of: switchControl, withOffset: 20)
+        titleLabel.autoAlignAxis(toSuperviewAxis: .horizontal)
     }
     
     deinit {

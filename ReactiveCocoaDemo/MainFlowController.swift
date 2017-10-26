@@ -9,36 +9,40 @@
 import Foundation
 import UIKit
 import ReactiveCocoa
+import ReactiveSwift
 
 class MainFlowController {
     
-    private var rootNavigationController: UINavigationController
+    fileprivate var rootNavigationController: UINavigationController
     
-    private var mainViewModel: MainViewModel!
-    private var mainViewController: MainViewController!
-    private var disposables = CompositeDisposable()
+    fileprivate var mainViewModel: MainViewModel!
+    fileprivate var mainViewController: MainViewController!
+    fileprivate var disposables = CompositeDisposable()
     
     init(rootNavigationController: UINavigationController) {
         self.rootNavigationController = rootNavigationController
-
+        
         mainViewModel = MainViewModel()
         mainViewController = MainViewController(viewModel: mainViewModel)
         setupObservers()
     }
     
-    private func setupObservers() {
-        let disposable = mainViewModel.selectedScreen.observeNext {[unowned self] (screen) in
-            self.presentScreen(screen)
+    fileprivate func setupObservers() {
+        let disposable = mainViewModel.selectedScreen.observeResult {[unowned self] (result) in
+            if case let .success(screen) = result {
+                self.presentScreen(screen)
+            }
+            
         }
-        disposables.addDisposable(disposable)
+        disposables.add(disposable)
     }
     
-    private func presentScreen(screen: Screen) {
+    fileprivate func presentScreen(_ screen: Screen) {
         switch screen {
-        case .Form:
+        case .form:
             presentForm()
             return
-        case .Loader:
+        case .loader:
             presentLoader()
             return
         default:
@@ -46,27 +50,25 @@ class MainFlowController {
         }
     }
     
-    private func presentForm() {
+    fileprivate func presentForm() {
         let presenter = UserDataPresenter(rootViewController: rootNavigationController)
         let viewModel = FormViewModel(userDataPresenter: presenter)
         let formViewController = FormViewController(viewModel: viewModel)
-        viewModel.acceptFormAction.rex_completed.observeOn(QueueScheduler.mainQueueScheduler).observeNext { [unowned self] in
-            self.dismissFormScreen()
-        }
-        
-        viewModel.acceptFormAction.values.observeNext {(user) in
-            print(user)
+        viewModel.acceptFormAction.completed.observe(on: QueueScheduler.main).observeResult { (result) in
+            if case .success(_) = result {
+                self.dismissFormScreen()
+            }
         }
         
         rootNavigationController.pushViewController(formViewController, animated: true)
     }
     
-    private func dismissFormScreen() {
-        rootNavigationController.popViewControllerAnimated(true)
+    fileprivate func dismissFormScreen() {
+        rootNavigationController.popViewController(animated: true)
     }
-
     
-    private func presentLoader() {
+    
+    fileprivate func presentLoader() {
         let viewModel = LoaderViewModel()
         let controller = LoaderViewController(viewModel: viewModel)
         rootNavigationController.pushViewController(controller, animated: true)

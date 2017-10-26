@@ -10,23 +10,24 @@ import Foundation
 import UIKit
 import PureLayout
 import ReactiveCocoa
-import Rex
+import ReactiveSwift
+
 class FormViewController: UIViewController {
     
-    private var viewModel: FormViewModel
+    fileprivate var viewModel: FormViewModel
     
-    private var stackView: UIStackView!
-    private var firstNameField: FormFieldView!
-    private var lastNameField: FormFieldView!
-    private var emailField: FormFieldView!
-    private var fields = [UIView]()
-    private var acceptButton: UIButton!
-    private var acceptCocoaAction: CocoaAction!
-    private var isSuperUserSwitch: FormSwitchFieldView!
+    fileprivate var stackView: UIStackView!
+    fileprivate var firstNameField: FormFieldView!
+    fileprivate var lastNameField: FormFieldView!
+    fileprivate var emailField: FormFieldView!
+    fileprivate var fields = [UIView]()
+    fileprivate var acceptButton: UIButton!
+    fileprivate var acceptCocoaAction: CocoaAction<UIButton>!
+    fileprivate var isSuperUserSwitch: FormSwitchFieldView!
     
-    private var buttonHeightConstraint: NSLayoutConstraint?
-    private var buttonWidthConstraint: NSLayoutConstraint?
-    private var disposables = CompositeDisposable()
+    fileprivate var buttonHeightConstraint: NSLayoutConstraint?
+    fileprivate var buttonWidthConstraint: NSLayoutConstraint?
+    fileprivate var disposables = CompositeDisposable()
     
     init(viewModel: FormViewModel) {
         self.viewModel = viewModel
@@ -39,11 +40,11 @@ class FormViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        edgesForExtendedLayout = .None
+        edgesForExtendedLayout = UIRectEdge()
         setupViewController()
     }
     
-    private func setupViewController() {
+    fileprivate func setupViewController() {
         view.backgroundColor = UIColor.demoLightBackgroundColor()
         createComponents()
         addViewsToSuperview()
@@ -51,30 +52,32 @@ class FormViewController: UIViewController {
         setupObservers()
     }
     
-    private func setupObservers() {
+    fileprivate func setupObservers() {
         acceptCocoaAction = CocoaAction(viewModel.acceptFormAction, { _ in })
-        disposables +=  viewModel.acceptFormAction.errors.observeOn(QueueScheduler.mainQueueScheduler).observeNext {[weak self] (error) in
-            guard let weakSelf = self else { return }
-            weakSelf.acceptButton.backgroundColor = UIColor.redColor()
+        disposables += 
+            viewModel.acceptFormAction.errors.observe(on: QueueScheduler.main).observeValues {[weak self] (error) in
+            guard let strongSelf = self else { return }
+            strongSelf.acceptButton.backgroundColor = .red
         }
-        disposables += viewModel.isFormValid.producer.skip(1).skipRepeats().startWithNext {[weak self] (isValid) in
-            guard let weakSelf = self else { return }
-            weakSelf.animateAcceptButton(isValid)
+        
+        disposables += viewModel.isFormValid.producer.skip(first: 1).skipRepeats().startWithValues {[weak self] (isValid) in
+            guard let strongSelf = self else { return }
+            strongSelf.animateAcceptButton(isValid)
         }
-        acceptButton.rex_pressed.value = acceptCocoaAction
+        acceptButton.reactive.pressed = acceptCocoaAction        
     }
     
-    private func animateAcceptButton(isEnabled: Bool) {
+    fileprivate func animateAcceptButton(_ isEnabled: Bool) {
         let width: CGFloat = isEnabled ? 240 : 60
         let height: CGFloat = isEnabled ? 60 : 30
         buttonWidthConstraint?.constant = width
         buttonHeightConstraint?.constant = height
-        UIView.animateWithDuration(0.35, animations: {
+        UIView.animate(withDuration: 0.35, animations: {
             self.view.layoutIfNeeded()
         })
     }
     
-    private func createComponents() {
+    fileprivate func createComponents() {
         stackView = createStackView()
         firstNameField = FormFieldView(viewModel: viewModel.firstNameViewModel)
         lastNameField = FormFieldView(viewModel: viewModel.lastNameViewModel)
@@ -89,49 +92,49 @@ class FormViewController: UIViewController {
     
 
     
-    private func createAcceptButton() -> UIButton {
+    fileprivate func createAcceptButton() -> UIButton {
         let button = UIButton()
-        button.setTitle(viewModel.acceptTitle, forState: .Normal)
-        button.setTitleColor(UIColor.demoTextColor(), forState: .Normal)
-        button.setTitleColor(UIColor.grayColor(), forState: .Disabled)
+        button.setTitle(viewModel.acceptTitle, for: UIControlState())
+        button.setTitleColor(UIColor.demoTextColor(), for: UIControlState())
+        button.setTitleColor(UIColor.gray, for: .disabled)
         button.layer.cornerRadius = 6
         button.showsTouchWhenHighlighted = true
         button.backgroundColor = UIColor.demoBackgroundColor()
         return button
     }
     
-    private func createStackView() -> UIStackView {
+    fileprivate func createStackView() -> UIStackView {
         let stackView = UIStackView()
-        stackView.alignment = .Center
-        stackView.axis = .Vertical
-        stackView.distribution = .EqualSpacing
+        stackView.alignment = .center
+        stackView.axis = .vertical
+        stackView.distribution = .equalSpacing
         stackView.spacing = 20
         return stackView
     }
     
-    private func addViewsToSuperview() {
+    fileprivate func addViewsToSuperview() {
         view.addSubview(stackView)
         fields.forEach { stackView.addArrangedSubview($0) }
         view.addSubview(acceptButton)
         
     }
     
-    private func applyConstraints() {
+    fileprivate func applyConstraints() {
         let insets = UIEdgeInsetsMake(20, 0, 0, 0)
         fields.forEach { (field) in
-            field.autoPinEdgeToSuperviewEdge(.Left, withInset: 10)
-            field.autoPinEdgeToSuperviewEdge(.Right, withInset: 10)
-            field.autoSetDimension(.Height, toSize: 60)
+            field.autoPinEdge(toSuperviewEdge: .left, withInset: 10)
+            field.autoPinEdge(toSuperviewEdge: .right, withInset: 10)
+            field.autoSetDimension(.height, toSize: 60)
         }
         
-        stackView.autoPinEdgesToSuperviewEdgesWithInsets(insets, excludingEdge: .Bottom)
-        stackView.autoPinEdge(.Bottom, toEdge: .Bottom, ofView: isSuperUserSwitch)
+        stackView.autoPinEdgesToSuperviewEdges(with: insets, excludingEdge: .bottom)
+        stackView.autoPinEdge(.bottom, to: .bottom, of: isSuperUserSwitch)
         
         
-        acceptButton.autoPinEdge(.Top, toEdge: .Bottom, ofView: stackView, withOffset: 40)
-        buttonHeightConstraint = acceptButton.autoSetDimension(.Height, toSize: 30)
-        buttonWidthConstraint = acceptButton.autoSetDimension(.Width, toSize: 60)
-        acceptButton.autoAlignAxisToSuperviewAxis(.Vertical)
+        acceptButton.autoPinEdge(.top, to: .bottom, of: stackView, withOffset: 40)
+        buttonHeightConstraint = acceptButton.autoSetDimension(.height, toSize: 30)
+        buttonWidthConstraint = acceptButton.autoSetDimension(.width, toSize: 60)
+        acceptButton.autoAlignAxis(toSuperviewAxis: .vertical)
     }
     
     deinit {

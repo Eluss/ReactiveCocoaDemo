@@ -13,13 +13,13 @@ import PureLayout
 
 class LoaderViewController: UIViewController {
     
-    private var viewModel: LoaderViewModel
-    private var taskAButton: UIButton!
-    private var taskBButton: UIButton!
-    private var statusIndicator: StatusIndicator!
+    fileprivate var viewModel: LoaderViewModel
+    fileprivate var taskAButton: UIButton!
+    fileprivate var taskBButton: UIButton!
+    fileprivate var statusIndicator: StatusIndicator!
     
-    private var taskACocoaAction: CocoaAction!
-    private var taskBCocoaAction: CocoaAction!
+    fileprivate var taskACocoaAction: CocoaAction<UIButton>!
+    fileprivate var taskBCocoaAction: CocoaAction<UIButton>!
     
     init(viewModel: LoaderViewModel) {
         self.viewModel = viewModel
@@ -32,11 +32,11 @@ class LoaderViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        edgesForExtendedLayout = .None
+        edgesForExtendedLayout = UIRectEdge()
         setupViewController()
     }
     
-    private func setupViewController() {
+    fileprivate func setupViewController() {
         view.backgroundColor = UIColor.demoLightBackgroundColor()
         createComponents()
         addViewsToSuperview()
@@ -44,45 +44,45 @@ class LoaderViewController: UIViewController {
         setupObservers()
     }
     
-    private func setupObservers() {
+    fileprivate func setupObservers() {
         taskACocoaAction = CocoaAction(viewModel.taskAAction) { _ in }
         taskBCocoaAction = CocoaAction(viewModel.taskBAction) { _ in }
         
-        taskAButton.rex_pressed.value = taskACocoaAction
-        taskBButton.rex_pressed.value = taskBCocoaAction
+        taskAButton.reactive.pressed = taskACocoaAction
+        taskBButton.reactive.pressed = taskBCocoaAction
     }
     
-    private func createComponents() {
+    fileprivate func createComponents() {
         taskAButton = createButtonWithTitle(viewModel.buttonATitle)
-        taskBButton = createButtonWithTitle(viewModel.buttonBTitle)
+        taskBButton = createButtonWithTitle(viewModel.buttonBTitle)        
         statusIndicator = StatusIndicator(rootView: view, status: viewModel.statusSignal)
     }
     
-    private func createButtonWithTitle(title: String) -> UIButton {
+    fileprivate func createButtonWithTitle(_ title: String) -> UIButton {
         let button = UIButton()
-        button.setTitle(title, forState: .Normal)
-        button.setTitleColor(UIColor.demoTextColor(), forState: .Normal)
-        button.setTitleColor(UIColor.grayColor(), forState: .Disabled)
+        button.setTitle(title, for: UIControlState())
+        button.setTitleColor(UIColor.demoTextColor(), for: UIControlState())
+        button.setTitleColor(UIColor.gray, for: .disabled)
         button.layer.cornerRadius = 6
         button.showsTouchWhenHighlighted = true
         button.backgroundColor = UIColor.demoBackgroundColor()
         return button
     }
     
-    private func addViewsToSuperview() {
+    fileprivate func addViewsToSuperview() {
         view.addSubview(taskAButton)
         view.addSubview(taskBButton)
     }
     
-    private func applyConstraints() {
+    fileprivate func applyConstraints() {
         
-        taskAButton.autoPinEdgeToSuperviewEdge(.Top, withInset: 20)
-        taskAButton.autoAlignAxisToSuperviewAxis(.Vertical)
-        taskAButton.autoSetDimensionsToSize(CGSizeMake(240, 60))
+        taskAButton.autoPinEdge(toSuperviewEdge: .top, withInset: 20)
+        taskAButton.autoAlignAxis(toSuperviewAxis: .vertical)
+        taskAButton.autoSetDimensions(to: CGSize(width: 240, height: 60))
         
-        taskBButton.autoPinEdge(.Top, toEdge: .Bottom, ofView: taskAButton, withOffset: 20)
-        taskBButton.autoAlignAxisToSuperviewAxis(.Vertical)
-        taskBButton.autoSetDimensionsToSize(CGSizeMake(240, 60))
+        taskBButton.autoPinEdge(.top, to: .bottom, of: taskAButton, withOffset: 20)
+        taskBButton.autoAlignAxis(toSuperviewAxis: .vertical)
+        taskBButton.autoSetDimensions(to: CGSize(width: 240, height: 60))
         
     }
     

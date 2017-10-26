@@ -9,20 +9,20 @@
 import Foundation
 import UIKit
 import ReactiveCocoa
-import Rex
+import ReactiveSwift
 
 class FormFieldView: UIView {
     
-    private var viewModel: FormFieldViewModel!
+    fileprivate var viewModel: FormFieldViewModel!
     
-    private var titleLabel: UILabel!
-    private var textField: UITextField!
+    fileprivate var titleLabel: UILabel!
+    fileprivate var textField: UITextField!
     
-    private var disposables = CompositeDisposable()
+    fileprivate var disposables = CompositeDisposable()
     
     init(viewModel: FormFieldViewModel) {
         self.viewModel = viewModel
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         setupView()
     }
     
@@ -30,7 +30,7 @@ class FormFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupView() {
+    fileprivate func setupView() {
         setupVisuals()
         createComponents()
         addViewsToSuperview()
@@ -38,29 +38,29 @@ class FormFieldView: UIView {
         setupObservers()
     }
     
-    private func setupVisuals() {
+    fileprivate func setupVisuals() {
         backgroundColor = UIColor.demoBackgroundColor()
         layer.cornerRadius = 6
     }
     
-    private func setupObservers() {
-        disposables += viewModel.isTitleHidden.producer.startWithNext {[weak self] (isTitleHidden) in
-            guard let weakSelf = self else { return }
-            UIView.animateWithDuration(0.4, animations: {
-                weakSelf.titleLabel.alpha = isTitleHidden ? 0 : 1
+    fileprivate func setupObservers() {
+        disposables += viewModel.isTitleHidden.producer.startWithValues {[weak self] (isTitleHidden) in
+            guard let strongSelf = self else { return }
+            UIView.animate(withDuration: 0.4, animations: {
+                strongSelf.titleLabel.alpha = isTitleHidden ? 0 : 1
             })
         }
-        disposables += viewModel.text <~ textField.rex_text.producer.map {
+        disposables += viewModel.text <~ textField.reactive.textValues.map {
             $0!
         }
     }
     
-    private func createComponents() {
+    fileprivate func createComponents() {
         textField = createTextField()
         titleLabel = createTitleLabel()
     }
     
-    private func createTextField() -> UITextField {
+    fileprivate func createTextField() -> UITextField {
         let textField = UITextField()
         textField.placeholder = viewModel.title
         textField.text = viewModel.text.value
@@ -68,26 +68,26 @@ class FormFieldView: UIView {
         return textField
     }
     
-    private func createTitleLabel() -> UILabel {
+    fileprivate func createTitleLabel() -> UILabel {
         let label = UILabel()
         label.textColor = UIColor.demoTextColor()
         label.text = viewModel.title
         return label
     }
     
-    private func addViewsToSuperview() {
+    fileprivate func addViewsToSuperview() {
         addSubview(titleLabel)
         addSubview(textField)
     }
     
-    private func applyConstraints() {
-        titleLabel.autoPinEdgeToSuperviewEdge(.Top, withInset: 10)
-        titleLabel.autoPinEdgeToSuperviewEdge(.Left, withInset: 20)
+    fileprivate func applyConstraints() {
+        titleLabel.autoPinEdge(toSuperviewEdge: .top, withInset: 10)
+        titleLabel.autoPinEdge(toSuperviewEdge: .left, withInset: 20)
         
-        textField.autoPinEdgeToSuperviewEdge(.Bottom, withInset: 10)
-        textField.autoPinEdgeToSuperviewEdge(.Left, withInset: 20)
-        textField.autoPinEdgeToSuperviewEdge(.Right, withInset: 20)
-        textField.autoPinEdge(.Top, toEdge: .Bottom, ofView: titleLabel, withOffset: 5)
+        textField.autoPinEdge(toSuperviewEdge: .bottom, withInset: 10)
+        textField.autoPinEdge(toSuperviewEdge: .left, withInset: 20)
+        textField.autoPinEdge(toSuperviewEdge: .right, withInset: 20)
+        textField.autoPinEdge(.top, to: .bottom, of: titleLabel, withOffset: 5)
     }
     
     deinit {

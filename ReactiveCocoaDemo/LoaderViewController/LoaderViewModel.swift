@@ -9,11 +9,12 @@
 import Foundation
 import enum Result.NoError
 import ReactiveCocoa
+import ReactiveSwift
 
 enum Status {
-    case InProgress
-    case Success
-    case Failed
+    case inProgress
+    case success
+    case failed
 }
 
 class LoaderViewModel {
@@ -24,31 +25,31 @@ class LoaderViewModel {
     var taskAAction: Action<Void, Void, NoError>!
     var taskBAction: Action<Void, Void, NoError>!
     var statusSignal: Signal<Status, NoError>
-    private var statusSink: Observer<Status, NoError>
+    fileprivate var statusSink: Signal<Status, NoError>.Observer
     
     init() {
         
         (statusSignal, statusSink) = Signal<Status, NoError>.pipe()
         
-        taskAAction = Action<Void, Void, NoError>({[weak self] () -> SignalProducer<Void, NoError> in
+        taskAAction = Action<Void, Void, NoError>(execute: {[weak self] () -> SignalProducer<Void, NoError> in
             return SignalProducer<Void, NoError> { observer, disposable in
-                guard let weakSelf = self else { return }
-                weakSelf.statusSink.sendNext(.InProgress)
-                let date = NSDate().dateByAddingTimeInterval(3)
-                QueueScheduler().scheduleAfter(date, action: {
-                        weakSelf.statusSink.sendNext(.Success)
-                        observer.sendCompleted()
+                guard let strongSelf = self else { return }
+                strongSelf.statusSink.send(value: .inProgress)
+                let date = Date().addingTimeInterval(3)
+                QueueScheduler().schedule(after: date, action: {
+                    strongSelf.statusSink.send(value: .success)
+                    observer.sendCompleted()
                 })
             }
         })
         
-        taskBAction = Action<Void, Void, NoError>({[weak self] () -> SignalProducer<Void, NoError> in
+        taskBAction = Action<Void, Void, NoError>(execute: {[weak self] () -> SignalProducer<Void, NoError> in
             return SignalProducer<Void, NoError> { observer, disposable in
-                guard let weakSelf = self else { return }
-                weakSelf.statusSink.sendNext(.InProgress)
-                let date = NSDate().dateByAddingTimeInterval(3)
-                QueueScheduler().scheduleAfter(date, action: {
-                    weakSelf.statusSink.sendNext(.Failed)
+                guard let strongSelf = self else { return }
+                strongSelf.statusSink.send(value: .inProgress)
+                let date = Date().addingTimeInterval(3)
+                QueueScheduler().schedule(after: date, action: {
+                    strongSelf.statusSink.send(value: .failed)
                     observer.sendCompleted()
                 })
             }

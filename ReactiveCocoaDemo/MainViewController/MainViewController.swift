@@ -9,14 +9,13 @@
 import Foundation
 import UIKit
 import PureLayout
-import Rex
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    private let CellReuseId = "Cell"
+    fileprivate let CellReuseId = "Cell"
     
-    private var viewModel: MainViewModel
-    private var tableView: UITableView!
+    fileprivate var viewModel: MainViewModel
+    fileprivate var tableView: UITableView!
     
     init(viewModel: MainViewModel) {
         self.viewModel = viewModel
@@ -32,46 +31,46 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         setupViewController()
     }
     
-    private func setupViewController() {
+    fileprivate func setupViewController() {
         createComponents()
         addViewsToSuperview()
         applyConstraints()
         setupObservers()
     }
     
-    private func setupObservers() {
+    fileprivate func setupObservers() {
         
     }
     
-    private func createComponents() {
+    fileprivate func createComponents() {
         tableView = createTableView()
     }
     
-    private func createTableView() -> UITableView {
+    fileprivate func createTableView() -> UITableView {
         let tableView = UITableView()
-        tableView.registerClass(MenuItemTableViewCell.self, forCellReuseIdentifier: MenuItemTableViewCell.reuseId)
+        tableView.register(MenuItemTableViewCell.self, forCellReuseIdentifier: MenuItemTableViewCell.reuseId)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = UIColor.demoBackgroundColor()
         return tableView
     }
     
-    private func addViewsToSuperview() {
+    fileprivate func addViewsToSuperview() {
         view.addSubview(tableView)
     }
     
-    private func applyConstraints() {
+    fileprivate func applyConstraints() {
         tableView.autoPinEdgesToSuperviewEdges()
     }
     
     // MARK: - UITableViewDataSource
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.menuItems.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(MenuItemTableViewCell.reuseId) as! MenuItemTableViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: MenuItemTableViewCell.reuseId) as! MenuItemTableViewCell
         let menuItem = viewModel.menuItems[indexPath.row]
         cell.applyModel(menuItem)
         return cell
@@ -79,8 +78,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: - UITableViewDelegate
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         viewModel.didChooseMenuItemAtIndex(indexPath.row)
     }
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import ReactiveCocoa
+import ReactiveSwift
 
 class FormFieldViewModel {
     
@@ -21,19 +22,19 @@ class FormFieldViewModel {
         setupObservers()
     }
     
-    private func setupObservers() {
+    fileprivate func setupObservers() {
         isTitleHidden <~ text.producer.map { $0.isEmpty }
     }
     
-    static func firstNameField(text: String) -> FormFieldViewModel {
+    static func firstNameField(_ text: String) -> FormFieldViewModel {
         return FormFieldViewModel(title: "First Name", text: MutableProperty<String>(text))
     }
     
-    static func lastNameField(text: String) -> FormFieldViewModel {
+    static func lastNameField(_ text: String) -> FormFieldViewModel {
         return FormFieldViewModel(title: "Last Name", text: MutableProperty<String>(text))
     }
     
-    static func emailField(text: String) -> FormFieldViewModel {
+    static func emailField(_ text: String) -> FormFieldViewModel {
         return FormFieldViewModel(title: "Email", text: MutableProperty<String>(text))
     }
     

@@ -10,13 +10,14 @@ import Foundation
 import ReactiveCocoa
 import enum Result.NoError
 import MBProgressHUD
+import ReactiveSwift
 
 class StatusIndicator {
     
-    private var progressHud: MBProgressHUD?
-    private var status: Signal<Status, NoError>
-    private var rootView: UIView
-    private var disposables = CompositeDisposable()
+    fileprivate var progressHud: MBProgressHUD?
+    fileprivate var status: Signal<Status, NoError>
+    fileprivate var rootView: UIView
+    fileprivate var disposables = CompositeDisposable()
     
     
     init(rootView: UIView, status: Signal<Status, NoError>) {
@@ -26,23 +27,23 @@ class StatusIndicator {
         setupObservers()
     }
  
-    private func setupObservers() {
-        disposables += status.observeOn(QueueScheduler.mainQueueScheduler).observeNext {[weak self] (status) in
-            guard let weakSelf = self else { return }
+    fileprivate func setupObservers() {
+        disposables += status.observe(on: QueueScheduler.main).observeValues {[weak self] (status) in
+            guard let strongSelf = self else { return }
             switch status {
-            case .InProgress:
-                weakSelf.progressHud = MBProgressHUD.showHUDAddedTo(weakSelf.rootView, animated: true)
-                weakSelf.progressHud?.label.text = "In progress..."
+            case .inProgress:
+                strongSelf.progressHud = MBProgressHUD.showAdded(to: strongSelf.rootView, animated: true)
+                strongSelf.progressHud?.label.text = "In progress..."
                 return
-            case .Success:
-                weakSelf.progressHud?.mode = .CustomView
-                weakSelf.progressHud?.label.text = "Success"
-                weakSelf.progressHud?.hideAnimated(true, afterDelay: 0.5)
+            case .success:
+                strongSelf.progressHud?.mode = .customView
+                strongSelf.progressHud?.label.text = "Success"
+                strongSelf.progressHud?.hide(animated: true, afterDelay: 0.5)
                 return
-            case .Failed:
-                weakSelf.progressHud?.mode = .CustomView
-                weakSelf.progressHud?.label.text = "Failed"
-                weakSelf.progressHud?.hideAnimated(true, afterDelay: 0.5)
+            case .failed:
+                strongSelf.progressHud?.mode = .customView
+                strongSelf.progressHud?.label.text = "Failed"
+                strongSelf.progressHud?.hide(animated: true, afterDelay: 0.5)
                 return
             }
         }

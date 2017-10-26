@@ -14,7 +14,7 @@ class MenuItemTableViewCell: UITableViewCell {
     static let reuseId = "MenuItemCell"
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .Subtitle, reuseIdentifier: "MenuItemCell")
+        super.init(style: .subtitle, reuseIdentifier: "MenuItemCell")
         contentView.backgroundColor = UIColor.demoBackgroundColor()
         textLabel?.textColor = UIColor.demoTextColor()
         detailTextLabel?.textColor = UIColor.demoTextColor()
@@ -24,7 +24,7 @@ class MenuItemTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func applyModel(menuItem: MenuItem) {
+    func applyModel(_ menuItem: MenuItem) {
         textLabel?.text = menuItem.title
         detailTextLabel?.text = menuItem.subtitle
     }

@@ -71,6 +71,7 @@ class FormViewModel {
     }
     
     fileprivate func setupObservers() {
+        // TODO:  fix
         disposables += isFormValid <~ SignalProducer.combineLatest(
             firstNameViewModel.text.producer,
             lastNameViewModel.text.producer,

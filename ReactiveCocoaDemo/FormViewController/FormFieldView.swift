@@ -50,7 +50,7 @@ class FormFieldView: UIView {
                 strongSelf.titleLabel.alpha = isTitleHidden ? 0 : 1
             })
         }
-        disposables += viewModel.text <~ textField.reactive.textValues.map {$0!}
+        disposables += viewModel.text <~ textField.reactive.continuousTextValues.map {$0!}
     }
     
     fileprivate func createComponents() {

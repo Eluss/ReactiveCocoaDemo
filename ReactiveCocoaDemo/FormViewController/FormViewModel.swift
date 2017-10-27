@@ -70,8 +70,7 @@ class FormViewModel {
         }
     }
     
-    fileprivate func setupObservers() {
-        // TODO:  fix
+    fileprivate func setupObservers() {        
         disposables += isFormValid <~ SignalProducer.combineLatest(
             firstNameViewModel.text.producer,
             lastNameViewModel.text.producer,
@@ -80,7 +79,7 @@ class FormViewModel {
             })
     }
     
-    func isValidEmail(_ testStr: String) -> Bool {
+    func isValidEmail(_ testStr: String) -> Bool {        
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         return emailTest.evaluate(with: testStr)

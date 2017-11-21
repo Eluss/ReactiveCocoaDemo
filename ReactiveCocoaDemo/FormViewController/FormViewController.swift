@@ -138,7 +138,7 @@ class FormViewController: UIViewController {
     }
     
     deinit {
-        disposables.dispose()
+//        disposables.dispose()
         print("[DEINIT] ---> FormViewController")
     }
     

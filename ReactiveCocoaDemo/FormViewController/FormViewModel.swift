@@ -9,6 +9,7 @@
 import Foundation
 import ReactiveCocoa
 import ReactiveSwift
+import enum Result.NoError
 
 class FormViewModel {
     
@@ -70,7 +71,14 @@ class FormViewModel {
         }
     }
     
-    fileprivate func setupObservers() {        
+    fileprivate func setupObservers() {
+        
+        saveUser().startWithResult { (result) in
+            switch result {
+                case .success(let r)
+            }
+        }
+        
         disposables += isFormValid <~ SignalProducer.combineLatest(
             firstNameViewModel.text.producer,
             lastNameViewModel.text.producer,
@@ -89,4 +97,15 @@ class FormViewModel {
         print("[DEINIT] ---> FormViewModel")
     }
     
+}
+
+struct Idea {
+    var content: String
+    var quality: Quality
+}
+
+enum Quality {
+    case great
+    case average
+    case worst
 }
